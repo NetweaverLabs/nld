@@ -6,8 +6,8 @@ import (
 	"net"
 	"os"
 
-	"github.com/NetwaeversLab/nld/paths"
-	"github.com/NetwaeversLab/nld/requests"
+	"github.com/NetweaverLabs/nld/paths"
+	"github.com/NetweaverLabs/nld/requests"
 )
 
 type Client struct {

@@ -2,20 +2,20 @@ package daemon
 
 import (
 	"encoding/gob"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
 
-	"github.com/NetwaeversLab/nld/paths"
-	"github.com/NetwaeversLab/nld/requests"
-	"github.com/NetwaeversLab/nld/responses"
-	"github.com/NetwaeversLab/nld/types"
+	"github.com/NetweaverLabs/nld/paths"
+	"github.com/NetweaverLabs/nld/requests"
+	"github.com/NetweaverLabs/nld/responses"
 )
 
 type Daemon struct {
 	logger  *log.Logger
-	handler map[string]types.DaemonHandler
+	handler map[string]DaemonHandler
 }
 
 // returns a daemon struct which will communicate with the cli
@@ -27,12 +27,13 @@ func NewDaemon() (*Daemon, error) {
 	logger := log.New(lf, "DAEMON ", log.Default().Flags())
 	return &Daemon{
 		logger:  logger,
-		handler: make(map[string]types.DaemonHandler),
+		handler: make(map[string]DaemonHandler),
 	}, nil
 }
 
 func (d *Daemon) AllHandlers() {
 	d.handler["echo"] = Echo
+	d.handler["create"] = Create
 }
 
 func (d *Daemon) Start() {
@@ -40,6 +41,8 @@ func (d *Daemon) Start() {
 		d.logger.Println("cleaning the socket")
 		os.Remove(paths.UNIXSOCKET)
 	}
+	d.AllHandlers()
+	d.logger.Println("loaded all handlers")
 	ln, err := net.Listen("unix", paths.UNIXSOCKET)
 	if err != nil {
 		d.logger.Println("error starting listner: ", err.Error())
@@ -67,13 +70,13 @@ func (d *Daemon) Start() {
 					d.logger.Println("error while decoding request: ", err.Error())
 				}
 			}
-			d.logger.Println("recieved a request from cli")
+			fmt.Println("req:", req)
 			resp := &responses.DaemonResponse{}
 			if h, ok := d.handler[req.Cmd]; ok {
 				resp = h(req)
 			} else {
 				resp.Status = "NOTOK"
-				resp.Payload = []string{"command not found in daemon"}
+				resp.Payload = "command not found in daemon"
 			}
 			if err := encoder.Encode(resp); err != nil {
 				d.logger.Println("error while encoding the response to cli: ", err.Error())

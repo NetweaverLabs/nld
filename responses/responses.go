@@ -1,6 +1,6 @@
 package responses
 
 type DaemonResponse struct {
-	Status  string   `gob:"Status"`
-	Payload []string `gob:"Payload"`
+	Status  string `gob:"Status"`
+	Payload any    `gob:"Payload"`
 }

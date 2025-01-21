@@ -7,6 +7,6 @@ type ServerRequest struct {
 }
 
 type DeamonRequest struct {
-	Cmd  string   `gob:"Cmd"`
-	Args []string `gob:"Args"`
+	Cmd  string `gob:"Cmd"`
+	Args any    `gob:"Args"`
 }

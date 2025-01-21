@@ -1,10 +1,16 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 
-	"github.com/NetwaeversLab/nld/daemon"
+	"github.com/NetweaverLabs/nld/daemon"
+	"github.com/NetweaverLabs/types"
 )
+
+func init() {
+	gob.Register(types.User{})
+}
 
 func main() {
 	d, err := daemon.NewDaemon()
